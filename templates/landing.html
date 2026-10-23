@@ -8,18 +8,23 @@
     <div class="hero-inner">
         <div class="hero-badge">Personal Finance Tracker</div>
         <h1 class="hero-title">
-            Know where your<br>
-            <em>money goes</em>
+            Know where your <span class="hero-highlight">money</span> goes
         </h1>
         <p class="hero-subtitle">
             Log expenses, understand your spending patterns,
             and take control of your financial life —
             one transaction at a time.
         </p>
-        <div class="hero-actions">
-            <a href="{{ url_for('register') }}" class="btn-primary">Start tracking free</a>
-            <a href="{{ url_for('login') }}" class="btn-ghost">Sign in</a>
-        </div>
+        <form class="hero-form" action="{{ url_for('register') }}" method="get">
+            <label for="hero-email" class="sr-only">Email address</label>
+            <input type="email" id="hero-email" name="email" class="hero-input"
+                   placeholder="Enter your email" required>
+            <button type="submit" class="hero-submit">Start tracking free</button>
+        </form>
+        <button type="button" id="openVideoModal" class="btn-ghost hero-video-btn" aria-haspopup="dialog" aria-controls="videoModal">▶ How it works</button>
+        <p class="hero-note">
+            Already tracking? <a href="{{ url_for('login') }}">Sign in</a>
+        </p>
     </div>
     <div class="hero-visual">
         <div class="mock-card">
@@ -58,6 +63,13 @@
                 </div>
             </div>
         </div>
+        <div class="mock-float">
+            <span class="mock-float-dot"></span>
+            <div>
+                <span class="mock-float-label">Just logged</span>
+                <span class="mock-float-value">Groceries · ₹860</span>
+            </div>
+        </div>
     </div>
 </section>
 
@@ -89,4 +101,126 @@
     </div>
 </section>
 
+<style>
+    .hero-video-btn { margin-top: 0.75rem; cursor: pointer; font-family: var(--font-body); }
+    .hero-video-btn:focus-visible,
+    .video-modal-close:focus-visible { outline: 2px solid var(--accent-2); outline-offset: 3px; }
+
+    .video-modal[hidden] { display: none; }
+
+    .video-modal {
+        position: fixed;
+        inset: 0;
+        z-index: 200;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        padding: 1rem;
+        background: rgba(0, 0, 0, 0.8);
+    }
+
+    .video-modal-dialog {
+        width: 100%;
+        max-width: 900px;
+        background: var(--ink);
+        border-radius: var(--radius-md);
+        padding: 1rem;
+    }
+
+    .video-modal-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 0.75rem;
+        color: var(--paper);
+    }
+
+    .video-modal-title {
+        font-family: var(--font-display);
+        font-size: 1.25rem;
+        font-weight: 400;
+    }
+
+    .video-modal-close {
+        background: transparent;
+        color: var(--paper);
+        border: 1px solid rgba(247, 246, 243, 0.3);
+        border-radius: var(--radius-sm);
+        padding: 0.4rem 0.9rem;
+        font-family: var(--font-body);
+        font-size: 0.85rem;
+        cursor: pointer;
+        transition: border-color 0.2s;
+    }
+
+    .video-modal-close:hover { border-color: var(--paper); }
+
+    .video-frame {
+        position: relative;
+        width: 100%;
+        padding-top: 56.25%;
+        border-radius: var(--radius-sm);
+        overflow: hidden;
+        background: #000;
+    }
+
+    .video-frame iframe {
+        position: absolute;
+        inset: 0;
+        width: 100%;
+        height: 100%;
+        border: 0;
+    }
+</style>
+
+<div id="videoModal" class="video-modal" hidden role="dialog" aria-modal="true" aria-labelledby="videoModalTitle">
+    <div class="video-modal-dialog">
+        <div class="video-modal-header">
+            <h2 id="videoModalTitle" class="video-modal-title">How it works</h2>
+            <button type="button" id="closeVideoModal" class="video-modal-close" aria-label="Close video">Close ✕</button>
+        </div>
+        <div class="video-frame">
+            <iframe id="howItWorksVideo"
+                    src="https://www.youtube.com/embed/dQw4w9WgXcQ?autoplay=0"
+                    title="How Spendly works"
+                    allow="accelerometer; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                    allowfullscreen></iframe>
+        </div>
+    </div>
+</div>
+
+{% endblock %}
+
+{% block scripts %}
+<script>
+    (function () {
+        const openBtn = document.getElementById('openVideoModal');
+        const modal = document.getElementById('videoModal');
+        const closeBtn = document.getElementById('closeVideoModal');
+        const iframe = document.getElementById('howItWorksVideo');
+        if (!openBtn || !modal) return;
+
+        function openModal() {
+            modal.hidden = false;
+            closeBtn.focus();
+        }
+
+        function closeModal() {
+            if (modal.hidden) return;
+            modal.hidden = true;
+            // Reassigning src reloads the iframe, which stops playback.
+            iframe.src = iframe.src;
+            openBtn.focus();
+        }
+
+        openBtn.addEventListener('click', openModal);
+        closeBtn.addEventListener('click', closeModal);
+        modal.addEventListener('click', function (e) {
+            if (e.target === modal) closeModal();
+        });
+        document.addEventListener('keydown', function (e) {
+            if (e.key === 'Escape') closeModal();
+        });
+    })();
+</script>
 {% endblock %}
